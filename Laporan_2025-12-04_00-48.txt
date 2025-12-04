@@ -1,0 +1,20 @@
+=== LAPORAN SESI PEMANCINGAN ===
+Waktu Cetak : 04-12-2025 Pukul 00:48
+Total Peserta: 3 Orang
+
+--- RINGKASAN KEUANGAN ---
+1. Total Uang Tiket Masuk : Rp 210000
+2. Modal Belanja Ikan     : Rp 114000 (Disisihkan)
+3. Total Dana Hadiah      : Rp 96000 (Dibagikan)
+4. Total Pendapatan Kantin: Rp 10000
+--------------------------------------------
+TOTAL UANG KAS (Kantin)   : Rp 10000
+--------------------------------------------
+
+--- DATA PESERTA & HASIL ---
+No   Nama                 Lapak      Status     Kopi       Ekor       Berat(gr) 
+------------------------------------------------------------------------------
+1    aih                  5          Lunas      0          12         1000      
+2    rio                  13         Lunas      2          13         1111      
+3    zuzu                 23         Lunas      0          10         1001      
+------------------------------------------------------------------------------
