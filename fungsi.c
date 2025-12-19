@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 #include "fungsi.h"
 
 struct peserta{
@@ -19,9 +20,11 @@ int noPeserta = 0;
 
 
 //TAMBAH DATA
-void tambahPeserta(){
+void tambahPeserta() {
     char lagi;
-    do{
+    char konfirmasi;
+
+    do {
         system("cls");
         printf("=== Input Peserta ===\n");
         printf("Nama : ");
@@ -37,12 +40,36 @@ void tambahPeserta(){
         data[noPeserta].beratIkan = 0;
         noPeserta++;
 
-        printf("Input lagi? (y/n): ");
+        printf("\nInput lagi? (y/n): ");
         getchar();
         lagi = getchar();
         getchar();
-    }while(lagi=='y' || lagi=='Y');
-    }
+
+        // === VALIDASI MINIMAL PESERTA SETELAH USER PILIH 'n' ===
+        if ((lagi == 'n' || lagi == 'N') && noPeserta < 7) {
+            system("cls");
+            printf("Peserta minimal 7 orang!\n");
+            printf("Jumlah peserta saat ini: %d\n\n", noPeserta);
+            printf("1. Tambah peserta lagi\n");
+            printf("2. Batalkan sesi pemancingan\n");
+            printf("Pilih (1/2): ");
+            konfirmasi = getchar();
+            getchar();
+
+            if (konfirmasi == '1') {
+                lagi = 'y'; // balik ke input peserta
+            } else {
+                    system("cls");
+                    printf("\nSesi pemancingan dibatalkan\n");
+                    printf("\nProgram dihentikan.\n");
+                    exit(0);
+            }
+        }
+
+    } while (lagi == 'y' || lagi == 'Y');
+}
+
+
 
 //MENU DALAM LIHAT PESERTA
 void menuLihatPeserta() {
@@ -231,71 +258,41 @@ void acakLapak() {
         return;
     }
 
-    // 1. SIAPKAN DAFTAR LAPAK
-    // Kita tulis manual urutannya: Ganjil dulu (supaya ada jarak), baru Genap.
-    // Kiri (1-14)
-    int kolamKiri[14] = {1, 3, 5, 7, 9, 11, 13, 2, 4, 6, 8, 10, 12, 14};
-    // Kanan (15-28)
-    int kolamKanan[14] = {15, 17, 19, 21, 23, 25, 27, 16, 18, 20, 22, 24, 26, 28};
-
-    srand(time(0)); // Reset pengacak waktu
-
-    // 2. ACAK (SHUFFLE) ARRAY KIRI
-    for(int i = 0; i < 14; i++) {
-        int acak = rand() % 14; 
-        // Tukar posisi i dengan posisi acak
-        int temp = kolamKiri[i];
-        kolamKiri[i] = kolamKiri[acak];
-        kolamKiri[acak] = temp;
-    }
-
-    // 3. ACAK (SHUFFLE) ARRAY KANAN
-    for(int i = 0; i < 14; i++) {
-        int acak = rand() % 14;
-        // Tukar posisi i dengan posisi acak
-        int temp = kolamKanan[i];
-        kolamKanan[i] = kolamKanan[acak];
-        kolamKanan[acak] = temp;
-    }
-
-    // 4. BAGIKAN KE PESERTA (Seling-seling Kiri-Kanan)
-    int hitungKiri = 0;  // Penghitung urutan kiri
-    int hitungKanan = 0; // Penghitung urutan kanan
+    // ===== PENGACAKAN LAPAK =====
+    int totalLapak = 28;
+    int step = round((float) totalLapak / noPeserta);
+    int posisi = 1;
+    // ============================================
 
     system("cls");
-    printf("=== HASIL KOCOK LAPAK ===\n\n");
+    printf("=== HASIL ACAK LAPAK ===\n\n");
     printf("%-20s %-10s %-10s\n", "NAMA", "LAPAK", "POSISI");
     printf("------------------------------------------\n");
 
     for(int i = 0; i < noPeserta; i++) {
-        // Jika lapak sudah habis (lebih dari 28 orang)
-        if (i >= 28) {
-            printf("%-20s (Tidak kebagian tempat)\n", data[i].nama);
-            data[i].lapak = 0; 
-            continue;
+
+        
+        // SIMPAN HASIL LAPAK
+        data[i].lapak = posisi;
+
+        // TENTUKAN SISI
+        if (posisi <= 14) {
+            printf("%-20s %-10d %-10s\n", data[i].nama, posisi, "Kanan");
+        } else {
+            printf("%-20s %-10d %-10s\n", data[i].nama, posisi, "Kiri");
         }
 
-        // Logika Seling-Seling:
-        // Kalau i genap (0, 2, 4...) -> Kasih Kiri
-        // Kalau i ganjil (1, 3, 5...) -> Kasih Kanan
-        
-        if (i % 2 == 0) { 
-            // Giliran KIRI
-            data[i].lapak = kolamKiri[hitungKiri];
-            printf("%-20s %-10d %-10s\n", data[i].nama, data[i].lapak, "Kiri");
-            hitungKiri++;
-        } 
-        else {
-            // Giliran KANAN
-            data[i].lapak = kolamKanan[hitungKanan];
-            printf("%-20s %-10d %-10s\n", data[i].nama, data[i].lapak, "Kanan");
-            hitungKanan++;
+        // PINDAH KE LAPAK BERIKUTNYA
+        posisi += step;
+        if (posisi > totalLapak) {
+            posisi = ((posisi - 1) % totalLapak) + 1;
         }
     }
 
     printf("\nSukses! Lapak sudah disimpan.\n");
     printf("Tekan ENTER untuk kembali...");
     getchar();
+
 }
 
 //FITUR SORT BY LAPAK
@@ -405,8 +402,8 @@ void pembayaran() {
         system("cls");
         printf("=== KASIR PEMBAYARAN ===\n");
         printf("Harga Tiket: Rp 70.000/orang\n");
-        printf("Harga Kopi : Rp  5.000/gelas\n\n");
-
+        printf("Harga Kopi : Rp  5.000/gelas\n");
+        printf("Harga Kopi : Rp  7.000/porsi\n\n");
         if (noPeserta == 0) {
             printf("Belum ada peserta.\n");
             printf("Tekan ENTER untuk kembali...");
@@ -453,6 +450,7 @@ void pembayaran() {
                 printf("\n--- Rincian Tagihan %s ---\n", data[idx].nama);
                 printf("Tiket Mancing : Rp 70.000\n");
                 printf("Kopi (%d gelas) : Rp %d\n", data[idx].beliKopi, biayaKopi);
+                printf("Mie (%d porsi) : Rp %d\n", data[idx].beliMie, biayaMie);
                 printf("-------------------------- +\n");
                 printf("TOTAL HARUS DIBAYAR: Rp %d\n", totalTagihan);
 
